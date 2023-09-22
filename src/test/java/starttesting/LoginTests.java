@@ -19,11 +19,11 @@ public class LoginTests {
         driver = new ChromeDriver();
         driver.navigate().to("https://ilcarro.web.app/search");
         driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(60, TimeUnit.MILLISECONDS);
+        driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
     }
 
     @Test
-    public void loginPositive(){
+    public void loginPositive() throws InterruptedException {
     /*
     1. Click login
     2.Fill input email
@@ -32,26 +32,28 @@ public class LoginTests {
     5. validate by text:Logged in success  in the element  //h2[@class='message']
      */
 
-        WebElement btnLogin = driver.findElement(By.xpath(""));
+        WebElement btnLogin = driver.findElement(By.xpath("//a[contains(@href, '/login')]"));
         btnLogin.click();
 
-        WebElement inputEmail = driver.findElement(By.xpath(""));
+        WebElement inputEmail = driver.findElement(By.xpath("//input[@id='email']"));
         inputEmail.click();
         inputEmail.clear();
-        inputEmail.sendKeys("");
+        inputEmail.sendKeys("abc@gmail.com");
 
-        WebElement inputPassword = driver.findElement(By.xpath(""));
+        WebElement inputPassword = driver.findElement(By.xpath("//input[@id='password']"));
         inputPassword.clear();
         inputPassword.clear();
-        inputPassword.sendKeys("");
+        inputPassword.sendKeys("Bruh12345!");
 
-        WebElement btnYalla = driver.findElement(By.xpath(""));
+        WebElement btnYalla = driver.findElement(By.xpath("//button[@type='submit']"));
         btnYalla.click();
+
+       // Thread.sleep(15000);
 
         WebElement textMessagePopUpH2 = driver.findElement(By.xpath("//h2[@class='message']"));
         String textMessageH2 = textMessagePopUpH2.getText().trim().toUpperCase();
-        String expectedResult = "Logged in success".toUpperCase();
-
+        String expectedResult = "LOGGED IN SUCCESS";
+        System.out.println(textMessageH2); // if assert fails, need to chek with sout
         Assert.assertEquals(textMessageH2, expectedResult);
     }
 
