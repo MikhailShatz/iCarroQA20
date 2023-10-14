@@ -4,7 +4,9 @@ import dto.UserDTO;
 import dto.UserDTOWith;
 import dto.UserDtoLombok;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.interactions.Actions;
 
 public class UserHelper extends BaseHelper{
 
@@ -30,12 +32,19 @@ public class UserHelper extends BaseHelper{
     By inputLastNameReg = (By.xpath("//input[@id='lastName']"));
     By inputEmailReg = (By.xpath("//input[@id='email']"));
     By inputPasswordReg = (By.xpath("//input[@id='password']"));
+    By btnLogout = By.xpath("/a[contains(@href, 'logout')]");
 
     String btnRegNewUser = "document.querySelector('#terms-of-use').click();";
-    By checkBoxReg = By.xpath("//label[@for='name']");
-
+    String btnOkPopUpStr = "document.querySelector(`[type='button']`).click()";
+  //  By checkBoxReg = By.xpath("//label[@for='name']");
+     By checkBoxReg = By.xpath("//label[@for='terms-of-use']");
     By btnYallaReg = By.xpath("//button[@type='submit']");
     By textPopUpMessageRegH1 = (By.xpath("//div[@class='dialog-container']//h1[@class='title']"));
+    By btnOkPopUp = By.xpath("//button[@type='button']");
+
+    By errorMessageWrongEmailReg = By.xpath("//input[@autocomplete='email']/..//div//div");
+    By errorMessageIncorrectPasswordReg = By.xpath("//input[@autocomplete='new-password']/..//div//div");
+
 
     public void login(UserDTO userDTO) {
         clickBase(btnLoginNavigatorMenu);
@@ -61,6 +70,10 @@ public class UserHelper extends BaseHelper{
         return isTextEqual(textSuccessLoginPopUp, "LOGGED IN SUCCESS");
     }
 
+    public boolean validatePopUpMessageLoginIncorrect(){
+        return isTextEqual(textSuccessLoginPopUp, "\"Login or Password incorrect\"");
+    }
+
     public void fillRegistrationForm(UserDtoLombok user) {
         clickBase(btnRegForm);
         typeTextBase(inputNameReg, user.getName());
@@ -68,30 +81,47 @@ public class UserHelper extends BaseHelper{
         typeTextBase(inputEmailReg, user.getEmail());
         typeTextBase(inputPasswordReg, user.getPassword());
        // jsClickBase(btnRegNewUser);
-        clickByXY(checkBoxReg, 10, 12);
+        clickByXY(checkBoxReg, 5, 15);
         clickBase(btnYallaReg);
-
-        /*
-
-
-        //checkbox
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("document.querySelector('#terms-of-use').click();");
-       // driver.findElement(By.xpath("//label[@for='terms-of-use']")).click();
-
-        driver.findElement(By.xpath("//button[@type='submit']")).click();
-
-        WebElement textMessagePopUpH2 = driver.findElement(By.xpath("//div[@class='dialog-container']//h1[@class='title']"));
-        String textMessageH1 = textMessagePopUpH2.getText().trim().toUpperCase();
-        String expectedResult = "Registered".toUpperCase();
-        System.out.println(textMessageH1); // if assert fails, need to check with sout
-        Assert.assertEquals(textMessageH1, expectedResult);
-
-         */
     }
 
     public boolean validatePopUpMessageSuccessAfterRegistration() {
         String expectedResult = "Registered".toUpperCase();
         return isTextEqual(textPopUpMessageRegH1, expectedResult);
+    }
+    public boolean btnLogoutExist(){
+        return isElementExist(btnLogout);
+    }
+
+    public void logout(){
+        clickBase(btnLogout);
+    }
+
+    public void clickOkPopUpSuccessLogin() {
+       // typeTextBase(textPopUpMessageRegH1, String.valueOf(Keys.ESCAPE));
+        // jsClickBase(btnOkPopUpStr);
+        //clickByXY(btnOkPopUp, 0.5, 2);
+        clickBase(textPopUpMessageRegH1);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        Actions actions = new Actions(driver);
+        actions.sendKeys(Keys.TAB).perform();
+        actions.sendKeys(Keys.ESCAPE).perform();
+    }
+
+    public boolean validateMessageIncorrectEmail() {
+        return isTextEqual(errorMessageWrongEmailReg, "Wrong email format");
+    }
+
+    public boolean validateMessageWrongPasswordReg() {
+        return isTextEqual(errorMessageIncorrectPasswordReg, "PASSWORD MUST CONTAIN 1 UPPERCASE LETTER, " +
+                "1 LOWERCASE LETTER, 1 NUMBER AND ONE SPECIAL SYMBOL OF [@$#^&*!]");
+    }
+
+    public boolean validateMessageBlankEmail() {
+        return isTextEqual(errorMessageWrongEmailReg, "Email is required");
     }
 }
